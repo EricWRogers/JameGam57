@@ -221,21 +221,44 @@ namespace Canis
 
         JPH::EAllowedDOFs BuildAllowedDOFs(const Rigidbody &_rigidbody)
         {
-            JPH::EAllowedDOFs allowedDOFs =
-                JPH::EAllowedDOFs::TranslationX |
-                JPH::EAllowedDOFs::TranslationY |
-                JPH::EAllowedDOFs::TranslationZ;
+            (void)_rigidbody;
+            return JPH::EAllowedDOFs::All;
+        }
 
-            if (!_rigidbody.lockRotationX)
-                allowedDOFs = allowedDOFs | JPH::EAllowedDOFs::RotationX;
+        bool ApplyLockedRotationAxes(
+            const Transform &_desiredTransform,
+            const Rigidbody &_rigidbody,
+            Vector3 &_worldRotation,
+            Vector3 &_angularVelocity)
+        {
+            if (!_rigidbody.lockRotationX && !_rigidbody.lockRotationY && !_rigidbody.lockRotationZ)
+                return false;
 
-            if (!_rigidbody.lockRotationY)
-                allowedDOFs = allowedDOFs | JPH::EAllowedDOFs::RotationY;
+            const Vector3 desiredWorldRotation = _desiredTransform.GetGlobalRotation();
+            bool corrected = false;
 
-            if (!_rigidbody.lockRotationZ)
-                allowedDOFs = allowedDOFs | JPH::EAllowedDOFs::RotationZ;
+            if (_rigidbody.lockRotationX)
+            {
+                corrected = corrected || std::abs(_worldRotation.x - desiredWorldRotation.x) > 0.0005f || std::abs(_angularVelocity.x) > 0.0005f;
+                _worldRotation.x = desiredWorldRotation.x;
+                _angularVelocity.x = 0.0f;
+            }
 
-            return allowedDOFs;
+            if (_rigidbody.lockRotationY)
+            {
+                corrected = corrected || std::abs(_worldRotation.y - desiredWorldRotation.y) > 0.0005f || std::abs(_angularVelocity.y) > 0.0005f;
+                _worldRotation.y = desiredWorldRotation.y;
+                _angularVelocity.y = 0.0f;
+            }
+
+            if (_rigidbody.lockRotationZ)
+            {
+                corrected = corrected || std::abs(_worldRotation.z - desiredWorldRotation.z) > 0.0005f || std::abs(_angularVelocity.z) > 0.0005f;
+                _worldRotation.z = desiredWorldRotation.z;
+                _angularVelocity.z = 0.0f;
+            }
+
+            return corrected;
         }
 
         void SetTransformFromWorldPose(Transform &_transform, const Vector3 &_worldPosition, const Vector3 &_worldRotation)
@@ -271,11 +294,6 @@ namespace Canis
             hash = HashCombine(hash, std::hash<u32>{}(_rigidbody.layer));
             hash = HashCombine(hash, std::hash<u32>{}(_rigidbody.mask));
             hash = HashCombine(hash, std::hash<bool>{}(_rigidbody.allowSleeping));
-            hash = HashCombine(hash, std::hash<bool>{}(_rigidbody.lockRotationX));
-            hash = HashCombine(hash, std::hash<bool>{}(_rigidbody.lockRotationY));
-            hash = HashCombine(hash, std::hash<bool>{}(_rigidbody.lockRotationZ));
-            hash = HashCombine(hash, HashVector(_rigidbody.linearVelocity));
-            hash = HashCombine(hash, HashVector(_rigidbody.angularVelocity));
             hash = HashCombine(hash, HashVector(glm::abs(_transform.GetGlobalScale())));
 
             if (_boxCollider != nullptr)
@@ -1007,9 +1025,24 @@ namespace Canis
                     continue;
 
                 const Vector3 worldPosition = ToCanisPosition(bodyInterface->GetCenterOfMassPosition(runtimeData.bodyID));
-                const Vector3 worldRotation = ToCanisRotation(bodyInterface->GetRotation(runtimeData.bodyID));
+                Vector3 worldRotation = ToCanisRotation(bodyInterface->GetRotation(runtimeData.bodyID));
+                const JPH::Vec3 bodyLinearVelocity = bodyInterface->GetLinearVelocity(runtimeData.bodyID);
+                const JPH::Vec3 bodyAngularVelocity = bodyInterface->GetAngularVelocity(runtimeData.bodyID);
+                Vector3 angularVelocity = Vector3(bodyAngularVelocity.GetX(), bodyAngularVelocity.GetY(), bodyAngularVelocity.GetZ());
+
+                if (ApplyLockedRotationAxes(*transform, *rigidbody, worldRotation, angularVelocity))
+                {
+                    bodyInterface->SetPositionAndRotation(
+                        runtimeData.bodyID,
+                        ToJoltPosition(worldPosition),
+                        ToJoltRotation(worldRotation),
+                        JPH::EActivation::Activate);
+                    bodyInterface->SetAngularVelocity(runtimeData.bodyID, ToJoltVec3(angularVelocity));
+                }
 
                 SetTransformFromWorldPose(*transform, worldPosition, worldRotation);
+                rigidbody->linearVelocity = Vector3(bodyLinearVelocity.GetX(), bodyLinearVelocity.GetY(), bodyLinearVelocity.GetZ());
+                rigidbody->angularVelocity = angularVelocity;
                 runtimeData.syncedLocalPosition = transform->position;
                 runtimeData.syncedLocalRotation = transform->rotation;
                 runtimeData.hasSyncedTransform = true;

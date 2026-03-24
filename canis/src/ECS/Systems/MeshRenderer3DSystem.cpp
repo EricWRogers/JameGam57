@@ -217,7 +217,7 @@ namespace Canis
             projection = glm::perspective(DEG2RAD * camera->fovDegrees, aspect, camera->nearClip, camera->farClip);
 
             const Vector3 eye = cameraTransform->GetGlobalPosition();
-            const Vector3 target = eye + cameraTransform->GetForward();
+            const Vector3 target = eye - cameraTransform->GetForward();
             const Vector3 up = cameraTransform->GetUp();
             view = glm::lookAt(eye, target, up);
             cameraPosition = eye;

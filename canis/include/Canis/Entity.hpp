@@ -686,7 +686,7 @@ namespace Canis
         Vector3 GetForward() const
         {
             const Matrix4 matrix = GetModelMatrix();
-            Vector4 forward4 = matrix * Vector4(0.0f, 0.0f, -1.0f, 0.0f);
+            Vector4 forward4 = matrix * Vector4(0.0f, 0.0f, 1.0f, 0.0f);
             return glm::normalize(Vector3(forward4.x, forward4.y, forward4.z));
         }
 
@@ -695,6 +695,13 @@ namespace Canis
             const Matrix4 matrix = GetModelMatrix();
             Vector4 up4 = matrix * Vector4(0.0f, 1.0f, 0.0f, 0.0f);
             return glm::normalize(Vector3(up4.x, up4.y, up4.z));
+        }
+
+        Vector3 GetRight() const
+        {
+            const Matrix4 matrix = GetModelMatrix();
+            Vector4 right4 = matrix * Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+            return glm::normalize(Vector3(right4.x, right4.y, right4.z));
         }
 
         bool HasParent() const

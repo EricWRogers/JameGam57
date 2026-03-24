@@ -704,7 +704,7 @@ Entities:
     Tag: ""
     Canis::Transform:
       active: true
-      position: [1.919525, 1.7835209, 0]
+      position: [0, 1.7835209, 0]
       rotation: [0, -0, 0]
       scale: [1, 1, 1]
       parent: 0
@@ -742,9 +742,10 @@ Entities:
         path: assets/defaults/models/capsule.glb
         uuid: 17154083321347000103
     PlayerController:
-      walkingSpeed: 1000
-      sprintingSpeed: 3000
-      turnSpeed: 100
+      walkingSpeed: 6
+      sprintingSpeed: 10
+      turnSpeed: 0.12
+      maxLookAngle: 89
       jumpImpulse: 7.5
       groundCheckDistance: 2
       groundCollisionMask: 1
