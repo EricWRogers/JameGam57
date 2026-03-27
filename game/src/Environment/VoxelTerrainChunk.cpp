@@ -18,6 +18,7 @@ namespace
         switch (_blockType)
         {
         case TerrainBlockType::Rock: return 0;
+        case TerrainBlockType::Bedrock: return 0;
         case TerrainBlockType::Ice: return 1;
         case TerrainBlockType::Gold: return 2;
         case TerrainBlockType::Uranium: return 3;
@@ -236,6 +237,9 @@ std::string VoxelTerrainChunk::GetMessage(const InteractionContext &_context)
     if (!ResolveTargetBlock(_context, blockCoords, blockType))
         return "";
 
+    if (blockType == TerrainBlockType::Bedrock)
+        return "Bedrock (Unbreakable)";
+
     return std::string("Left Click to Break ") + GetBlockName(blockType);
 }
 
@@ -248,6 +252,9 @@ bool VoxelTerrainChunk::HandleInteraction(const InteractionContext &_context)
     glm::ivec3 blockCoords = glm::ivec3(0);
     TerrainBlockType blockType = TerrainBlockType::Air;
     if (!ResolveTargetBlock(_context, blockCoords, blockType))
+        return false;
+
+    if (blockType == TerrainBlockType::Bedrock)
         return false;
 
     SetBlock(blockCoords.x, blockCoords.y, blockCoords.z, TerrainBlockType::Air);
@@ -303,6 +310,7 @@ std::string VoxelTerrainChunk::GetBlockName(TerrainBlockType _blockType) const
     switch (_blockType)
     {
     case TerrainBlockType::Rock: return "Rock Block";
+    case TerrainBlockType::Bedrock: return "Bedrock";
     case TerrainBlockType::Ice: return "Ice Block";
     case TerrainBlockType::Gold: return "Gold Block";
     case TerrainBlockType::Uranium: return "Uranium Block";
@@ -322,6 +330,7 @@ Canis::SceneAssetHandle VoxelTerrainChunk::GetDropPrefab(TerrainBlockType _block
     case TerrainBlockType::Ice: return iceDropPrefab;
     case TerrainBlockType::Gold: return goldDropPrefab;
     case TerrainBlockType::Uranium: return uraniumDropPrefab;
+    case TerrainBlockType::Bedrock:
     case TerrainBlockType::Air:
     default:
         break;

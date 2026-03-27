@@ -8,7 +8,7 @@ Entities:
     Tag: MainCamera
     Canis::Transform:
       active: true
-      position: [0, 1, 0]
+      position: [0, 0.8, 0]
       rotation: [0, 0, 0]
       scale: [1, 1, 1]
       parent: 7544183909755889777
@@ -32,7 +32,7 @@ Entities:
     Tag: ""
     Canis::Transform:
       active: true
-      position: [0, -5.5, 0]
+      position: [0, -11, 0]
       rotation: [0, 0, 0]
       scale: [24, 1, 24]
       parent: 0
@@ -184,14 +184,14 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023401
       children:
-        - 1257661230620354436
-        - 5023751921379675705
-        - 17948509531190735553
-        - 4292790862921957770
-        - 8775869542321381961
-        - 6401813298685364581
-        - 14257762949918755424
-        - 619443207819042314
+        - 13878994708372978388
+        - 6193696260525521170
+        - 16781763540294726128
+        - 2951819649717190677
+        - 91485106403745463
+        - 1078363316653700897
+        - 1015021799526710713
+        - 2491145777852812001
     InventoryBarUI:
       slotCount: 8
       slotSize: 56
@@ -256,12 +256,12 @@ Entities:
     Tag: INFO_TEXT
     Canis::RectTransform:
       active: true
-      position: [0, 0]
+      position: [0, 114.00009]
       size: [50, 33]
       scale: [1, 1]
-      anchorMin: [0.5, 0.5]
-      anchorMax: [0.5, 0.5]
-      pivot: [0.5, 0.5]
+      anchorMin: [0.5, 0]
+      anchorMax: [0.5, 0]
+      pivot: [0.5, 0]
       originOffset: [0, 0]
       depth: 0.001
       rotation: 0
@@ -431,9 +431,12 @@ Entities:
       chunkHeight: 24
       baseHeight: 6
       maxHeightVariation: 10
+      hillHeightBoost: 6
+      bedrockLayerHeight: 1
       surfaceIceHeight: 11
       heightNoiseScale: 0.075
       detailNoiseScale: 0.16
+      hillNoiseScale: 0.03
       caveNoiseScale: 0.12
       rockDropPrefab: assets/prefabs/rock_item.scene
       iceDropPrefab: assets/prefabs/ice_item.scene
@@ -455,7 +458,7 @@ Entities:
       color: [0.88235295, 0.68771625, 0.22058824, 1]
       intensity: 1.2
       range: 12
-  - Entity: 1257661230620354436
+  - Entity: 13878994708372978388
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -472,8 +475,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 967800389851477666
-        - 15822846540188099234
+        - 172839946554895929
+        - 2661017337377720509
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -481,7 +484,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 967800389851477666
+  - Entity: 172839946554895929
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -496,17 +499,17 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 1257661230620354436
+      parent: 13878994708372978388
       children:
         []
     Canis::Sprite2D:
-      color: [0.9411765, 0.025836216, 0.025836216, 1]
+      color: [0, 0, 0, 0]
       uv: [0, 0, 1, 1]
       flipX: false
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 15822846540188099234
+  - Entity: 2661017337377720509
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -521,18 +524,18 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 1257661230620354436
+      parent: 13878994708372978388
       children:
         []
     Canis::Text:
-      text: 5
+      text: ""
       color: [1, 1, 1, 1]
       alignment: 2
       horizontalBoundary: 0
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 5023751921379675705
+  - Entity: 6193696260525521170
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -549,8 +552,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 387478815476469532
-        - 2660189290323739917
+        - 6019783980885128355
+        - 3120349868222956956
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -558,7 +561,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 387478815476469532
+  - Entity: 6019783980885128355
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -573,7 +576,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 5023751921379675705
+      parent: 6193696260525521170
       children:
         []
     Canis::Sprite2D:
@@ -583,7 +586,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 2660189290323739917
+  - Entity: 3120349868222956956
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -598,7 +601,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 5023751921379675705
+      parent: 6193696260525521170
       children:
         []
     Canis::Text:
@@ -609,7 +612,7 @@ Entities:
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 17948509531190735553
+  - Entity: 16781763540294726128
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -626,8 +629,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 11078565041734819797
-        - 17981542142686196761
+        - 13259657964480513500
+        - 7186170470860895158
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -635,7 +638,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 11078565041734819797
+  - Entity: 13259657964480513500
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -650,7 +653,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 17948509531190735553
+      parent: 16781763540294726128
       children:
         []
     Canis::Sprite2D:
@@ -660,7 +663,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 17981542142686196761
+  - Entity: 7186170470860895158
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -675,7 +678,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 17948509531190735553
+      parent: 16781763540294726128
       children:
         []
     Canis::Text:
@@ -686,7 +689,7 @@ Entities:
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 4292790862921957770
+  - Entity: 2951819649717190677
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -703,8 +706,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 13890087400663234729
-        - 1631013582626063801
+        - 17410248415588312818
+        - 15785959475353743380
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -712,7 +715,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 13890087400663234729
+  - Entity: 17410248415588312818
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -727,7 +730,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 4292790862921957770
+      parent: 2951819649717190677
       children:
         []
     Canis::Sprite2D:
@@ -737,7 +740,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 1631013582626063801
+  - Entity: 15785959475353743380
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -752,7 +755,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 4292790862921957770
+      parent: 2951819649717190677
       children:
         []
     Canis::Text:
@@ -763,7 +766,7 @@ Entities:
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 8775869542321381961
+  - Entity: 91485106403745463
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -780,8 +783,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 4368773200508711975
-        - 12961319872241546825
+        - 847925683067014699
+        - 14253071012263638254
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -789,7 +792,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 4368773200508711975
+  - Entity: 847925683067014699
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -804,7 +807,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 8775869542321381961
+      parent: 91485106403745463
       children:
         []
     Canis::Sprite2D:
@@ -814,7 +817,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 12961319872241546825
+  - Entity: 14253071012263638254
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -829,7 +832,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 8775869542321381961
+      parent: 91485106403745463
       children:
         []
     Canis::Text:
@@ -840,7 +843,7 @@ Entities:
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 6401813298685364581
+  - Entity: 1078363316653700897
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -857,8 +860,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 4465876859854572374
-        - 14379976734230293789
+        - 18300037879327546137
+        - 10511396206749916091
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -866,7 +869,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 4465876859854572374
+  - Entity: 18300037879327546137
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -881,7 +884,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 6401813298685364581
+      parent: 1078363316653700897
       children:
         []
     Canis::Sprite2D:
@@ -891,7 +894,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 14379976734230293789
+  - Entity: 10511396206749916091
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -906,7 +909,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 6401813298685364581
+      parent: 1078363316653700897
       children:
         []
     Canis::Text:
@@ -917,7 +920,7 @@ Entities:
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 14257762949918755424
+  - Entity: 1015021799526710713
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -934,8 +937,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 2518892906462569043
-        - 2638962153208367286
+        - 4417861495441021091
+        - 3019353745368172740
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -943,7 +946,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 2518892906462569043
+  - Entity: 4417861495441021091
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -958,7 +961,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 14257762949918755424
+      parent: 1015021799526710713
       children:
         []
     Canis::Sprite2D:
@@ -968,7 +971,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 2638962153208367286
+  - Entity: 3019353745368172740
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -983,7 +986,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 14257762949918755424
+      parent: 1015021799526710713
       children:
         []
     Canis::Text:
@@ -994,7 +997,7 @@ Entities:
       FontAsset:
         uuid: 14618725492368012463
         fontSize: 22
-  - Entity: 619443207819042314
+  - Entity: 2491145777852812001
     Name: Inventory Slot
     Tag: ""
     Canis::RectTransform:
@@ -1011,8 +1014,8 @@ Entities:
       rotationOriginOffset: [0, 0]
       parent: 6129844738291023402
       children:
-        - 18086909781727524313
-        - 11817653828700636009
+        - 18180451096473331960
+        - 9734487213772454570
     Canis::Sprite2D:
       color: [0.07, 0.09, 0.12, 0.82]
       uv: [0, 0, 1, 1]
@@ -1020,7 +1023,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 18086909781727524313
+  - Entity: 18180451096473331960
     Name: Inventory Icon
     Tag: ""
     Canis::RectTransform:
@@ -1035,7 +1038,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 619443207819042314
+      parent: 2491145777852812001
       children:
         []
     Canis::Sprite2D:
@@ -1045,7 +1048,7 @@ Entities:
       flipY: false
       TextureAsset:
         uuid: 16060716090729117806
-  - Entity: 11817653828700636009
+  - Entity: 9734487213772454570
     Name: Inventory Count
     Tag: ""
     Canis::RectTransform:
@@ -1060,7 +1063,7 @@ Entities:
       depth: 0.001
       rotation: 0
       rotationOriginOffset: [0, 0]
-      parent: 619443207819042314
+      parent: 2491145777852812001
       children:
         []
     Canis::Text:

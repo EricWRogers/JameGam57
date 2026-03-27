@@ -109,6 +109,11 @@ namespace
         return normalization > 0.0f ? (total / normalization) : 0.0f;
     }
 
+    float RidgedNoise2D(float _x, float _z, int _seed, int _octaves)
+    {
+        return 1.0f - std::abs((FractalNoise2D(_x, _z, _seed, _octaves) * 2.0f) - 1.0f);
+    }
+
     float FractalNoise3D(float _x, float _y, float _z, int _seed, int _octaves)
     {
         float total = 0.0f;
@@ -150,31 +155,152 @@ namespace
             _terrain.seed + 101,
             2);
         const float blended = std::clamp((broad * 0.75f) + (detail * 0.25f), 0.0f, 1.0f);
-        return _terrain.baseHeight + static_cast<int>(std::round(blended * static_cast<float>(_terrain.maxHeightVariation)));
+
+        const float hillScale = std::max(0.005f, _terrain.hillNoiseScale);
+        const float hillShape = RidgedNoise2D(
+            static_cast<float>(_globalX) * hillScale,
+            static_cast<float>(_globalZ) * hillScale,
+            _terrain.seed + 173,
+            4);
+        const float hillMask = FractalNoise2D(
+            static_cast<float>(_globalX) * hillScale * 0.55f,
+            static_cast<float>(_globalZ) * hillScale * 0.55f,
+            _terrain.seed + 211,
+            2);
+        const float hillStrength = Saturate((hillShape - 0.38f) / 0.62f) * Saturate((hillMask - 0.42f) / 0.58f);
+        const float hillBoost = std::pow(hillStrength, 1.35f) * static_cast<float>(std::max(0, _terrain.hillHeightBoost));
+
+        return _terrain.baseHeight
+            + static_cast<int>(std::round((blended * static_cast<float>(_terrain.maxHeightVariation)) + hillBoost));
+    }
+
+    Canis::Vector3 GetCaveWarpedPosition(const GenerateTerrain &_terrain, int _globalX, int _y, int _globalZ)
+    {
+        const float warpScale = std::max(0.005f, _terrain.caveNoiseScale * 0.38f);
+        const float warpStrength = 6.0f;
+        const float x = static_cast<float>(_globalX);
+        const float y = static_cast<float>(_y);
+        const float z = static_cast<float>(_globalZ);
+
+        const float warpX = (FractalNoise3D(
+            (x + 17.31f) * warpScale,
+            (y - 4.73f) * warpScale,
+            (z + 11.19f) * warpScale,
+            _terrain.seed + 421,
+            2) * 2.0f) - 1.0f;
+        const float warpY = (FractalNoise3D(
+            (x - 23.14f) * warpScale,
+            (y + 8.62f) * warpScale,
+            (z - 19.47f) * warpScale,
+            _terrain.seed + 463,
+            2) * 2.0f) - 1.0f;
+        const float warpZ = (FractalNoise3D(
+            (x + 5.61f) * warpScale,
+            (y + 13.08f) * warpScale,
+            (z - 29.53f) * warpScale,
+            _terrain.seed + 509,
+            2) * 2.0f) - 1.0f;
+
+        return Canis::Vector3(
+            x + (warpX * warpStrength),
+            y + (warpY * warpStrength * 0.55f),
+            z + (warpZ * warpStrength));
+    }
+
+    float GetSpaghettiTunnelField(const GenerateTerrain &_terrain, const Canis::Vector3 &_warpedPosition)
+    {
+        const float tunnelScale = std::max(0.01f, _terrain.caveNoiseScale * 1.28f);
+        const float x = _warpedPosition.x;
+        const float y = _warpedPosition.y;
+        const float z = _warpedPosition.z;
+
+        const float primarySlice = std::abs((FractalNoise3D(
+            x * tunnelScale,
+            y * tunnelScale * 0.56f,
+            z * tunnelScale,
+            _terrain.seed + 401,
+            3) * 2.0f) - 1.0f);
+        const float branchSlice = std::abs((FractalNoise3D(
+            (x + 41.0f) * tunnelScale * 1.22f,
+            (y - 12.0f) * tunnelScale * 0.72f,
+            (z - 31.0f) * tunnelScale * 1.22f,
+            _terrain.seed + 487,
+            3) * 2.0f) - 1.0f);
+
+        const float thicknessNoise = FractalNoise3D(
+            (x - 13.0f) * tunnelScale * 0.64f,
+            (y + 7.0f) * tunnelScale * 0.64f,
+            (z + 17.0f) * tunnelScale * 0.64f,
+            _terrain.seed + 533,
+            2);
+        const float branchNoise = FractalNoise3D(
+            (x + 29.0f) * tunnelScale * 0.58f,
+            (y - 5.0f) * tunnelScale * 0.58f,
+            (z - 23.0f) * tunnelScale * 0.58f,
+            _terrain.seed + 557,
+            2);
+
+        const float primaryThickness = Lerp(0.075f, 0.11f, thicknessNoise);
+        const float branchThickness = Lerp(0.055f, 0.09f, branchNoise);
+
+        const float primaryTunnel = 1.0f - Saturate(primarySlice / std::max(0.001f, primaryThickness));
+        const float branchTunnel = 1.0f - Saturate(branchSlice / std::max(0.001f, branchThickness));
+        return Saturate(std::max(primaryTunnel, branchTunnel * 0.94f));
+    }
+
+    float GetTallTunnelField(const GenerateTerrain &_terrain, int _globalX, int _y, int _globalZ)
+    {
+        float strongestTunnel = 0.0f;
+        for (int verticalOffset = -1; verticalOffset <= 1; ++verticalOffset)
+        {
+            const Canis::Vector3 warpedPosition = GetCaveWarpedPosition(_terrain, _globalX, _y + verticalOffset, _globalZ);
+            const float tunnelField = GetSpaghettiTunnelField(_terrain, warpedPosition);
+            const float weight = (verticalOffset == 0) ? 1.0f : 0.92f;
+            strongestTunnel = std::max(strongestTunnel, tunnelField * weight);
+        }
+
+        return strongestTunnel;
+    }
+
+    float GetChamberField(const GenerateTerrain &_terrain, const Canis::Vector3 &_warpedPosition)
+    {
+        const float chamberScale = std::max(0.006f, _terrain.caveNoiseScale * 0.48f);
+        const float x = _warpedPosition.x;
+        const float y = _warpedPosition.y;
+        const float z = _warpedPosition.z;
+
+        const float chamberNoise = FractalNoise3D(
+            x * chamberScale,
+            y * chamberScale * 0.72f,
+            z * chamberScale,
+            _terrain.seed + 611,
+            4);
+        const float chamberMask = FractalNoise2D(
+            x * chamberScale * 0.55f,
+            z * chamberScale * 0.55f,
+            _terrain.seed + 643,
+            3);
+
+        const float chamberShape = Saturate((chamberNoise - 0.70f) / 0.30f);
+        const float chamberPresence = Saturate((chamberMask - 0.58f) / 0.42f);
+        return Saturate(chamberShape * chamberPresence);
     }
 
     float GetCaveField(const GenerateTerrain &_terrain, int _globalX, int _y, int _globalZ)
     {
-        const float scale = std::max(0.01f, _terrain.caveNoiseScale);
-        const float chamberNoise = FractalNoise3D(
-            static_cast<float>(_globalX) * scale * 0.85f,
-            static_cast<float>(_y) * scale * 0.72f,
-            static_cast<float>(_globalZ) * scale * 0.85f,
-            _terrain.seed + 401,
-            3);
-        const float tunnelNoise = RidgedNoise3D(
-            static_cast<float>(_globalX) * scale * 1.95f,
-            static_cast<float>(_y) * scale * 1.45f,
-            static_cast<float>(_globalZ) * scale * 1.95f,
-            _terrain.seed + 487,
-            2);
-
-        return Saturate((chamberNoise * 0.35f) + (tunnelNoise * 0.65f));
+        // Layered, warped noise keeps the cave network tunnel-first, with sparse chambers.
+        const Canis::Vector3 warpedPosition = GetCaveWarpedPosition(_terrain, _globalX, _y, _globalZ);
+        const float tunnelField = GetTallTunnelField(_terrain, _globalX, _y, _globalZ);
+        const float chamberField = GetChamberField(_terrain, warpedPosition);
+        return Saturate(std::max(tunnelField, chamberField));
     }
 
     bool IsTerrainAir(const GenerateTerrain &_terrain, int _globalX, int _y, int _globalZ, int _columnHeight)
     {
         if (_y < 0)
+            return false;
+
+        if (_y < _terrain.bedrockLayerHeight)
             return false;
 
         if (_y >= _columnHeight)
@@ -185,14 +311,17 @@ namespace
             return false;
 
         const float caveField = GetCaveField(_terrain, _globalX, _y, _globalZ);
-        float caveThreshold = 0.72f;
+        float caveThreshold = 0.60f;
         if (depthFromSurface <= 4)
-            caveThreshold -= 0.07f;
+        {
+            const float surfaceBias = static_cast<float>(depthFromSurface) / 4.0f;
+            caveThreshold += Lerp(0.22f, 0.06f, surfaceBias);
+        }
         if (_y <= 3)
-            caveThreshold += 0.06f;
+            caveThreshold += 0.16f;
 
         const float normalizedHeight = static_cast<float>(_y) / static_cast<float>(std::max(1, _terrain.chunkHeight - 1));
-        caveThreshold += std::abs(normalizedHeight - 0.42f) * 0.12f;
+        caveThreshold += std::abs(normalizedHeight - 0.43f) * 0.18f;
 
         return caveField > caveThreshold;
     }
@@ -244,6 +373,9 @@ namespace
     TerrainBlockType GetTerrainBlockType(const GenerateTerrain &_terrain, int _globalX, int _y, int _globalZ, int _columnHeight)
     {
         const bool isSurface = (_y == (_columnHeight - 1));
+        if (_y < _terrain.bedrockLayerHeight)
+            return TerrainBlockType::Bedrock;
+
         if (IsTerrainAir(_terrain, _globalX, _y, _globalZ, _columnHeight))
             return TerrainBlockType::Air;
 
@@ -289,9 +421,12 @@ void RegisterGenerateTerrainScript(Canis::App& _app)
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, chunkHeight);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, baseHeight);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, maxHeightVariation);
+    REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, hillHeightBoost);
+    REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, bedrockLayerHeight);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, surfaceIceHeight);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, heightNoiseScale);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, detailNoiseScale);
+    REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, hillNoiseScale);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, caveNoiseScale);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, rockDropPrefab);
     REGISTER_PROPERTY(generateTerrainConf, GenerateTerrain, iceDropPrefab);
@@ -496,6 +631,8 @@ void GenerateTerrain::Ready()
     chunkHeight = std::max(4, chunkHeight);
     baseHeight = std::clamp(baseHeight, 1, chunkHeight - 1);
     maxHeightVariation = std::max(1, maxHeightVariation);
+    hillHeightBoost = std::max(0, hillHeightBoost);
+    bedrockLayerHeight = std::clamp(bedrockLayerHeight, 0, chunkHeight);
     surfaceIceHeight = std::max(1, surfaceIceHeight);
     m_loadedChunkEntities.clear();
     m_lastCenterChunkX = std::numeric_limits<int>::max();

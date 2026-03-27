@@ -14,6 +14,7 @@ enum class TerrainBlockType : unsigned char
     Ice = 2,
     Gold = 3,
     Uranium = 4,
+    Bedrock = 5,
 };
 
 class VoxelTerrainChunk : public Canis::ScriptableEntity, public I_Interactable
